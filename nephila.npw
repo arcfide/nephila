@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web>
+
+<limbo>
+  <title>Nephila WEB Programming system for APL</title>
+  <shorttitle>NEPHILA</shorttitle>
+  <author>Aaron W. Hsu</author>
+  <version>0.1</version>
+  <copyright>
+    <p>
+      Copyright &copy; 2012 Aaron W. Hsu 
+      <address> 
+        &lt;<a href="mailto:arcfide@sacrideo.us">arcfide@sacrideo.us</a>&gr;
+      </address>
+    </p>
+    <p>
+      Permission to use, copy, modify, and distribute this software for any
+      purpose with or without fee is hereby granted, provided that the above
+      copyright notice and this permission notice appear in all copies.
+    </p>
+    <p>
+      THE SOFTWARE IS PROVIDED <q>AS IS</q> AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+      WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+      MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+      ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+      WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+      ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+      OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+    </p>
+  </copyright>
+</limbo>
+
+<titlepage />
+
+<hsect strong="1" head="Introduction">
+  <text>
+    <p>
+      This is Nephila, a new form of WEB programming designed specifically
+      to innovate and move past the traditional WEB programming interfaces 
+      without losing the important benefits that a full features WEB 
+      system provides, including things like the typesetting of program 
+      code and the sophisticated forms of cross-referencing that traditional
+      WEB programming systems provide by default. It tries to leverage 
+      existing and well founded technologies as well as improve the degree
+      of integration possible for a web programming system. One of these 
+      key changes is the use of XML as its programming syntax, rather than 
+      some other ad hoc approach. This enables a number of third party tools, 
+      including text editors and scripts, to work on the document natively, 
+      with little to no actual modification necessary. This reduces the 
+      large number of glue elements that would otherwise be necessary in 
+      order to integrate traditional WEB syntaxes into the tools that modern 
+      programmers use. Moreover, it provides a degree of flexibility in terms 
+      of language and production target without limiting the power of 
+      traditional WEB features, including the production of print quality 
+      resources. 
+    </p>
+    <p>
+      Currently, the Nephila system targets the APL programming language, 
+      XHTML and TeX documentation languages, and uses its own XML schema 
+      to wrap these two together. This program is written using the Dyalog 
+      APL variant of the APL programming language.
+    </p>
+  </text>
+  <aplexec>
+    Version←0 1 ⋄ VersionString←'Version 0.1'
+  </aplexec>
+</hsect>
+
+<hsect head="Parsing the syntax">
+  <text>
+    Parsing the XML syntax is easier given that we can work with the 
+    <code>⎕XML</code> parser that we already have built into the Dyalog 
+    APL system.
+  </text>
+  <apldef name="PARSE∆WEB">
+    R←PARSE∆WEB FN;T
+    T←FN ⎕NTIE 0 0
+    R←'UTF-8' ⎕UCS ⎕UCS ⎕NREAD T,80,2↑⎕NSIZE T
+    R←'whitespace' 'trim' ⎕XML R
+    ⎕NUNTIE T
+  </apldef>
+</hsect>
+
+<hsect head="Tangling WEBs">
+  <text>
+    At the moment, I am taking a short cut in tangling and assuming that 
+    nothing else but code appears in the code elements of a web. 
+    These elements are: aplexec, aplfix, apldef.  There are not code 
+    fragments and the like, and nothing is anything but top-level.
+  </text>
+  <apldef name="TANGLE∆WEB">
+    TANGLE∆WEB WEB;ENS;D;F;E;NL;DO
+    NL←⎕UCS 133 ⋄ ENS←WEB[;2]
+    (D F E)←{(ENS∊⊂⍵)/⍳⍴ENS}¨'apldef' 'aplfix' 'aplexec'
+    DO←{0 &lt; ⍴⍵:⍺⍺{T←NL,⍵ ⋄ ⍺⍺ 1↓¨(NL=T)⊂T}¨WEB[⍵;3]}
+    {⎕FX ↑⍵}DO D ⋄ ⎕FIX DO F ⋄ ⍎¨DO E
+  </apldef>
+</hsect>
+
+<hsect head="Weaving WEBs">
+  <text>
+    I have nothing to put in the Weaving section of this program at the 
+    moment, since I am just doing tangling right now.
+  </text>
+</hsect>
+
+<hsect head="Using Nephila as an User Command">
+  <text>
+    Eventually I want to be able to use this program as an user command,
+    but at the moment this is not possible. The structure and mechanism
+    to turn this program into an user command program will be in here.
+  </text>
+</hsect>
+
+<hsect head="Index">
+  <index />
+</hsect>
+
+</web>
