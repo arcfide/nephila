@@ -81,26 +81,113 @@
   </apldef>
 </hsect>
 
+<sect>
+  <text>
+    In our system, we have a global variable <code>NL</code>
+    that represents the newline code for our XML system. 
+    On UNIX machines this is the UCS value 133.
+  </text>
+  <aplexec>
+    NL←⎕UCS 133
+  </aplexec>
+</sect>
+
 <hsect head="Tangling WEBs">
   <text>
-    At the moment, I am taking a short cut in tangling and assuming that 
-    nothing else but code appears in the code elements of a web. 
-    These elements are: aplexec, aplfix, apldef.  There are not code 
-    fragments and the like, and nothing is anything but top-level.
+    The actual act of tangling is divided into the following basic 
+    passes inside of our main tangling function, <code>TANGLA∆WEB</code>.
   </text>
   <apldef name="TANGLE∆WEB">
-    TANGLE∆WEB WEB;ENS;D;F;E;NL;DO
-    NL←⎕UCS 133 ⋄ ENS←WEB[;2]
-    (D F E)←{(ENS∊⊂⍵)/⍳⍴ENS}¨'apldef' 'aplfix' 'aplexec'
-    DO←{0 &lt; ⍴⍵:⍺⍺{T←NL,⍵ ⋄ ⍺⍺ 1↓¨(NL=T)⊂T}¨WEB[⍵;3]}
-    {⎕FX ↑⍵}DO D ⋄ ⎕FIX DO F ⋄ ⍎¨DO E
+    TANGLE∆WEB FN;WEB;ROWS;<aplref name="Local variables for TANGLE∆WEB" />
+    WEB←PARSE∆WEB FN ⋄ ROWS←⊃⍴WEB
+    <aplref name="Extract code elements into &lt;code&gr;CODE&lt;code&gr;" />
+    <aplref name="Sort code elements by name" />
+    <aplref name="Concatenate like named code elements" />
+    <aplref name="Substitute all code fragments" />
+    <aplref name="Fix and execute all top-level code elements" />
   </apldef>
 </hsect>
 
+<sect>
+  <text>
+    <p>
+      We have four different types of code elements in our program. The first 
+      three&mdash;<code>apldef</code>, <code>aplfix</code>, 
+      <code>aplexec</code>&mdash;all represent top-level elements.
+      The last element, <code>aplfrg</code>, is the WEB fragment element that 
+      allows us to lift code out of its computer order into something that is
+      hopefully more natural to the human reader. The <code>aplexec</code>
+      all of the top-level elements can be extended, as each one has a name 
+      attribute. If two top-level elements with the same name attribute and the
+      same element name (it is an error to use the same name value with 
+      two different element names) occur, they are concatenated together. 
+      The <code>aplexec</code> always has the same implicit name, and cannot 
+      be changed. The only difference between these top-level elements and 
+      the fragments is that fragments are only realized inside of the tangled 
+      code when they are referenced by an <code>aplref</code> element that 
+      occurs inside the body of one of the top-level code elements. Otherwise, 
+      they work largely the same way as the normal elements do. 
+    </p>
+    <p>
+      This leads us to the first pass of our tangle procedure, which extracts 
+      out all of these code elements from the main web syntax, to be dealt 
+      with separately. We extract these code elements into the 
+      <code>CODE</code> variable. This structure is exactly the same as the 
+      <code>WEB</code> structure except that all of the normal elements are 
+      removed, and only the code elements are left as the top-level of nesting.
+    </p>
+  </text>
+  <aplfrg name="Extract code elements into &lt;code&gr;CODE&lt;code&gr;">
+    CENS←'apldef' 'aplfix' 'aplexec' 'aplfrg'
+    CODE←(2≤WEB[;1])⌿WEB    ⍝ Only elements and children of the right nesting
+    G←+\2=CODE[;1]          ⍝ Group IDs of elements 
+    C←(∨⌿CENS∘.≡CODE[;2])/G ⍝ Group IDs for code elements
+    CODE←(⊃C∨.=⊂G)⌿CODE     ⍝ Eliminate non-code groups
+  </aplfrg>
+</sect>
+
+<sect>
+  <aplfrg name="Local variables for TANGLE∆WEB">
+    ;CENS;CODE;G;C
+  </aplfrg>
+</sect>
+
+<sect>
+  <text>
+    Now that we have the code into its own set of stuff, we should sort
+    the groups of code based on their names. This makes redundant some of 
+    code elements so that we can remove them, and in essence, prepares our 
+    <code>CODE</code> element for concatenation.
+  </text>
+  <aplfrg name="Sort code elements by name">
+    
+  </aplfrg>
+</sect>
+
+<sect>
+  <aplfrg name="???">
+    ENS←WEB[;2]
+    (D F E)←{(ENS∊⊂⍵)/⍳⍴ENS}¨'apldef' 'aplfix' 'aplexec'
+    DO←{0 &lt; ⍴⍵:⍺⍺{T←NL,⍵ ⋄ ⍺⍺ 1↓¨(NL=T)⊂T}¨WEB[⍵;3]}
+    {⎕FX ↑⍵}DO D ⋄ ⎕FIX DO F ⋄ ⍎¨DO E
+  </aplfrg>
+</sect>
+
 <hsect head="Weaving WEBs">
   <text>
-    I have nothing to put in the Weaving section of this program at the 
-    moment, since I am just doing tangling right now.
+    <p>
+      There are two different weaving targets that we have. We can either
+      WEAVE code to the \TeX\ backend or to the XHTML backend. In both cases, 
+      the approach is similiar. Both the XHTML layout and the \TeX\ layout 
+      use fairly linear approaches to laying out the document, so we can 
+      just follow that.
+    </p>
+    <p>
+      The <code>WEAVE∆WEB</code> function itself will eventually take a left
+      argument indicating whether the output target is \TeX\ or XHTML or even 
+      something else. At the moment, it only takes a right argument and it 
+      will always output XHTML.
+    </p>
   </text>
 </hsect>
 
